@@ -1,27 +1,27 @@
 'use strict';
 
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const basicAuth = require('./auth/middleware/basic.js');
+const errorHandler = require('./middleware/errorHandler.js')
+const app = express(); // singleton -> there can only be one
+const { handleSignup, handleSignin} = require('./auth/router.js');
 
-// instantiate our server and our DB connection
-const PORT = process.env.PORT || 3001;
-
-const app = express();
-const userRouter = require('./middleware/routes/user');
-
-//  setup the server
 app.use(cors());
-app.use(express.json()); // json
-app.use(express.urlencoded({ extended: true })) ;// form data
 
-app.use('/', userRouter);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })) ;
+
+app.post('/signup', basicAuth, handleSignup);
+app.post('/signin', basicAuth, handleSignin);
+
+app.use(errorHandler)
 
 module.exports = {
   app,
   start: (port) => {
-    app.listen(PORT, () => {
-      console.log('App Started!');
-    })
+    app.listen(port, () => {
+      console.log('Running on port:', port);
+    });
   }
-};
+}

@@ -1,10 +1,17 @@
-'use strict';
+'use strict'
 
 require('dotenv').config();
-const { sequelize } = require('./src/models');
-const server = require('./src/server');
-const PORT = process.env.PORT || 3001;
+const server = require('./src/server.js');
+const { Sequelize, DataTypes } = require('sequelize');
 
-sequelize.sync().then(() => {
-    server.start(PORT);
-});
+// instantiate our server and our DB connection
+const PORT = process.env.PORT || 3001;
+// const DATABASE_URL = process.env.DATABASE_URL || 'sqlite:memory:';
+const DATABASE_URL = 'sqlite:memory:';
+
+const sequelize = new Sequelize(DATABASE_URL, {logging: false});
+
+sequelize.sync()
+  .then( () => {
+    server.start(PORT)
+  });
